@@ -4,6 +4,7 @@ data/
 # 外部缓存（自动下载的模型不需要上传）
 *.cache/
 modelscope/
+checkpoints/spkrec-ecapa/
 
 # Python 缓存
 __pycache__/
