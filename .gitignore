@@ -1,8 +1,9 @@
 # 训练数据（太大，不上传git）
 data/
 
-# 模型权重（太大）
-checkpoints/
+# 外部缓存（自动下载的模型不需要上传）
+*.cache/
+modelscope/
 
 # Python 缓存
 __pycache__/
