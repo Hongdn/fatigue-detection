@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 560" width="100%" role="img">
+  <title>管制员疲劳监控系统架构（v1.6）</title>
+  <desc>当前链路：降噪→VAD→openSMILE→XGBoost+SHAP→规则引擎+个体基线判状态 · ExpressiveSpeech 28k全量训练 · step3特征级基线保留待用</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text class="th" x="340" y="24" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="500" fill="#2C2C2A">管制员疲劳监控系统架构（v1.6）</text>
+  <text class="ts" x="340" y="42" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#888780">链路: VAD→openSMILE→XGBoost+SHAP→规则引擎+个体基线 · step1-6全部编码</text>
+
+  <g font-family="sans-serif">
+    <rect x="40" y="58" width="180" height="40" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+    <text x="130" y="82" text-anchor="middle" font-size="13" font-weight="500" fill="#444441" dominant-baseline="central">电台语音流</text>
+    <rect x="250" y="58" width="180" height="40" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+    <text x="340" y="82" text-anchor="middle" font-size="13" font-weight="500" fill="#444441" dominant-baseline="central">值班排班日志</text>
+    <rect x="460" y="58" width="180" height="40" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5" stroke-dasharray="3 2"/>
+    <text x="550" y="82" text-anchor="middle" font-size="13" font-weight="500" fill="#444441" dominant-baseline="central">ASR转写文本</text>
+  </g>
+  <line x1="340" y1="100" x2="340" y2="118" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g font-family="sans-serif">
+    <rect x="40" y="122" width="180" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.9"/>
+    <text x="130" y="140" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C" dominant-baseline="central">降噪增强</text>
+    <text x="130" y="158" text-anchor="middle" font-size="9" fill="#185FA5" dominant-baseline="central">MossFormerGAN ✓</text>
+    <rect x="250" y="122" width="180" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="340" y="140" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C" dominant-baseline="central">语音活动检测</text>
+    <text x="340" y="158" text-anchor="middle" font-size="9" fill="#185FA5" dominant-baseline="central">Silero VAD ✓</text>
+    <rect x="460" y="122" width="180" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="550" y="140" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C" dominant-baseline="central">TSE目标提取</text>
+    <text x="550" y="158" text-anchor="middle" font-size="9" fill="#185FA5" dominant-baseline="central">ClearerVoice（二期）</text>
+  </g>
+  <line x1="340" y1="168" x2="340" y2="186" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g font-family="sans-serif">
+    <rect x="80" y="190" width="240" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="200" y="216" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C" dominant-baseline="central">openSMILE eGeMAPS 88维 ✓</text>
+    <rect x="360" y="190" width="240" height="44" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5" stroke-dasharray="3 2"/>
+    <text x="480" y="208" text-anchor="middle" font-size="11" fill="#888780" dominant-baseline="central">特征级z-score基线</text>
+    <text x="480" y="224" text-anchor="middle" font-size="9" fill="#5F5E5A" dominant-baseline="central">保留待用（当前不接入）</text>
+  </g>
+  <line x1="340" y1="236" x2="340" y2="254" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g font-family="sans-serif">
+    <rect x="140" y="258" width="400" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.2"/>
+    <text x="340" y="284" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489" dominant-baseline="central">XGBoost+SHAP 双任务回归 ✓ CCC=0.873</text>
+  </g>
+  <line x1="340" y1="304" x2="340" y2="322" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g font-family="sans-serif">
+    <rect x="100" y="326" width="480" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.2"/>
+    <text x="340" y="346" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">规则引擎 + 个体基线 ✓ 判定 兴奋/稳定/疲劳</text>
+    <text x="340" y="362" text-anchor="middle" font-size="9" fill="#0F6E56" dominant-baseline="central">percentile自适应阈值 · SpeakerBaseline无注册冷启动</text>
+  </g>
+  <line x1="340" y1="372" x2="340" y2="390" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <g font-family="sans-serif">
+    <rect x="160" y="394" width="360" height="36" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+    <text x="340" y="416" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" dominant-baseline="central">实时告警 · 复核报告 · FRMS留痕</text>
+  </g>
+
+  <rect x="20" y="450" width="640" height="60" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="340" y="468" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#3C3489">数据: ExpressiveSpeech 28k全量 · CCC_arousal=0.873 · CCC_exertion=0.617</text>
+  <text x="340" y="486" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#444441">双维度分离: arousal靠F0/频谱 · exertion靠shimmer/jitter · 个体基线自学习</text>
+  <text x="340" y="504" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#A32D2D">Gradio Demo已运行 · step3特征级基线保留待多说话人数据</text>
+</svg>

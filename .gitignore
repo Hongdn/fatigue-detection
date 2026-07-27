@@ -1,0 +1,38 @@
+# 训练数据（太大，不上传git）
+data/
+
+# 模型权重（太大）
+checkpoints/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# 输出（可重新生成）
+output/*.wav
+output/*.csv
+output/*.json
+output/~$*
+
+# 虚拟环境
+venv/
+env/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# 临时文件
+*.tmp
+*.temp
+~$*

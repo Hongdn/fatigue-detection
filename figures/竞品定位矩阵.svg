@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 480" width="100%" role="img">
+  <title>管制员疲劳监控竞品定位矩阵</title>
+  <desc>技术路线 vs 成熟度二维定位图，标注各竞品位置与我方目标定位</desc>
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="340" y="26" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="500" fill="#2C2C2A">管制员疲劳监控 — 竞品定位矩阵</text>
+  <text x="340" y="44" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#888780">技术路线 × 成熟度</text>
+
+  <g font-family="sans-serif">
+    <line x1="90" y1="410" x2="640" y2="410" stroke="#B4B2A9" stroke-width="1" marker-end="url(#arr2)"/>
+    <line x1="90" y1="410" x2="90" y2="75" stroke="#B4B2A9" stroke-width="1" marker-end="url(#arr2)"/>
+    <text x="635" y="428" text-anchor="end" font-size="11" fill="#888780">技术路线 →</text>
+    <text x="84" y="82" text-anchor="end" font-size="11" fill="#888780">成熟度 →</text>
+
+    <text x="160" y="428" text-anchor="middle" font-size="11" fill="#5F5E5A">生理/穿戴</text>
+    <text x="290" y="428" text-anchor="middle" font-size="11" fill="#5F5E5A">语音为主</text>
+    <text x="425" y="428" text-anchor="middle" font-size="11" fill="#5F5E5A">多模态</text>
+    <text x="550" y="428" text-anchor="middle" font-size="11" fill="#5F5E5A">图像/视频为主</text>
+
+    <text x="82" y="374" text-anchor="end" font-size="11" fill="#5F5E5A">研究</text>
+    <text x="82" y="294" text-anchor="end" font-size="11" fill="#5F5E5A">原型试用</text>
+    <text x="82" y="204" text-anchor="end" font-size="11" fill="#5F5E5A">已落地</text>
+    <text x="82" y="124" text-anchor="end" font-size="11" fill="#5F5E5A">成熟商用</text>
+
+    <line x1="90" y1="370" x2="635" y2="370" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="2 3"/>
+    <line x1="90" y1="290" x2="635" y2="290" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="2 3"/>
+    <line x1="90" y1="200" x2="635" y2="200" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="2 3"/>
+    <line x1="90" y1="120" x2="635" y2="120" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="2 3"/>
+
+    <circle cx="155" cy="365" r="8" fill="#D85A30" fill-opacity="0.7" stroke="#993C1D" stroke-width="0.8"/>
+    <text x="168" y="369" font-size="11" fill="#4A1B0C">民航二所(脑电+心率)</text>
+
+    <circle cx="290" cy="372" r="8" fill="#D85A30" fill-opacity="0.7" stroke="#993C1D" stroke-width="0.8"/>
+    <text x="303" y="376" font-size="11" fill="#4A1B0C">高校学术(民航大学/飞院·语音)</text>
+
+    <circle cx="150" cy="125" r="8" fill="#888780" fill-opacity="0.6" stroke="#5F5E5A" stroke-width="0.8"/>
+    <text x="163" y="129" font-size="11" fill="#444441">航科院FRMS(飞行员场景·非管制员)</text>
+
+    <circle cx="385" cy="295" r="8" fill="#D85A30" fill-opacity="0.7" stroke="#993C1D" stroke-width="0.8"/>
+    <text x="398" y="299" font-size="11" fill="#4A1B0C">西南空管局网络公司(原型)</text>
+
+    <circle cx="545" cy="205" r="11" fill="#D85A30" fill-opacity="0.85" stroke="#993C1D" stroke-width="1.2"/>
+    <text x="535" y="190" text-anchor="end" font-size="11" font-weight="500" fill="#4A1B0C">中科昊音 ⚠ 最大威胁</text>
+    <text x="535" y="204" text-anchor="end" font-size="10" fill="#712B13">(声纹+图像·已落地西南空管局)</text>
+
+    <circle cx="560" cy="245" r="8" fill="#D85A30" fill-opacity="0.7" stroke="#993C1D" stroke-width="0.8"/>
+    <text x="573" y="249" font-size="11" fill="#4A1B0C">太极(甘肃·视频+排班)</text>
+
+    <circle cx="430" cy="170" r="8" fill="#BA7517" fill-opacity="0.7" stroke="#854F0B" stroke-width="0.8"/>
+    <text x="443" y="174" font-size="11" fill="#412402">川大智胜(潜在·多模态+空管渠道)</text>
+
+    <circle cx="280" cy="285" r="11" fill="#E1F5EE" stroke="#0F6E56" stroke-width="2"/>
+    <circle cx="280" cy="285" r="3" fill="#0F6E56"/>
+    <text x="268" y="278" text-anchor="end" font-size="11" font-weight="500" fill="#085041">我们(目标定位)</text>
+    <text x="268" y="292" text-anchor="end" font-size="10" fill="#0F6E56">语音为主·轻量·班次级基线</text>
+
+    <g transform="translate(455,86)">
+      <rect x="0" y="0" width="175" height="64" rx="6" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+      <circle cx="14" cy="16" r="5" fill="#D85A30" fill-opacity="0.7" stroke="#993C1D" stroke-width="0.8"/>
+      <text x="26" y="20" font-size="10" fill="#444441">直接竞品</text>
+      <circle cx="14" cy="34" r="5" fill="#BA7517" fill-opacity="0.7" stroke="#854F0B" stroke-width="0.8"/>
+      <text x="26" y="38" font-size="10" fill="#444441">潜在进入者</text>
+      <circle cx="14" cy="52" r="5" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+      <text x="26" y="56" font-size="10" fill="#444441">我方目标定位</text>
+      <circle cx="105" cy="16" r="5" fill="#888780" fill-opacity="0.6" stroke="#5F5E5A" stroke-width="0.8"/>
+      <text x="117" y="20" font-size="10" fill="#444441">相关市场</text>
+    </g>
+  </g>
+</svg>

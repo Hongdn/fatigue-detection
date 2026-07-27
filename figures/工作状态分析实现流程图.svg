@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 620" width="100%" role="img">
+  <title>工作状态分析实现流程（v1.6）</title>
+  <desc>当前链路: VAD→openSMILE→XGBoost+SHAP→规则引擎+个体基线→GradioDemo · step3特征基线保留</desc>
+  <defs>
+    <marker id="ar4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="340" y="26" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="500" fill="#2C2C2A">工作状态分析 — 实现流程（v1.6 全链路完成）</text>
+  <text x="340" y="44" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#888780">当前: VAD→openSMILE→XGBoost+SHAP→规则引擎+个体基线→GradioDemo · step3特征基线保留</text>
+
+  <g font-family="sans-serif">
+    <rect x="200" y="60" width="280" height="36" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+    <text x="340" y="82" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#444441">音频输入（parquet嵌入WAV / 文件上传）</text>
+    <line x1="340" y1="98" x2="340" y2="116" stroke="#888780" stroke-width="1.5" marker-end="url(#ar4)"/>
+
+    <rect x="100" y="120" width="480" height="68" rx="10" fill="none" stroke="#5F5E5A" stroke-width="0.8" stroke-dasharray="4 3"/>
+    <text x="110" y="114" font-size="10" fill="#5F5E5A" font-style="italic">step1 前置处理层</text>
+    <rect x="120" y="132" width="140" height="42" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+    <text x="190" y="150" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#444441">降噪</text>
+    <text x="190" y="166" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#5F5E5A">MossFormerGAN</text>
+    <rect x="275" y="132" width="140" height="42" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+    <text x="345" y="150" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#444441">语音活动检测</text>
+    <text x="345" y="166" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#5F5E5A">Silero VAD</text>
+    <rect x="430" y="132" width="140" height="42" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5" stroke-dasharray="2 2"/>
+    <text x="500" y="150" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#888780">TSE目标提取</text>
+    <text x="500" y="166" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#888780">（二期）</text>
+    <line x1="340" y1="190" x2="340" y2="208" stroke="#888780" stroke-width="1.5" marker-end="url(#ar4)"/>
+
+    <rect x="150" y="212" width="180" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="240" y="230" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="#0C447C">step2 openSMILE 88维</text>
+    <text x="240" y="248" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#185FA5">eGeMAPSv02 真实语音特征</text>
+    <rect x="350" y="212" width="180" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.9"/>
+    <text x="440" y="230" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="#085041">文本认知指标</text>
+    <text x="440" y="248" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#0F6E56">口误率/复诵（二期）</text>
+    <line x1="340" y1="258" x2="340" y2="276" stroke="#888780" stroke-width="1.5" marker-end="url(#ar4)"/>
+
+    <rect x="150" y="280" width="380" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+    <text x="340" y="298" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">step4 XGBoost+SHAP 双任务回归 ✓ CCC=0.873</text>
+    <text x="340" y="316" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#534AB7">arousal（目标score_arousal） + exertion（目标score_nature）</text>
+    <line x1="340" y1="326" x2="340" y2="344" stroke="#888780" stroke-width="1.5" marker-end="url(#ar4)"/>
+
+    <rect x="130" y="348" width="420" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.2"/>
+    <text x="340" y="368" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">step5 规则引擎 + 个体基线 ✓ 判定兴奋/稳定/疲劳</text>
+    <text x="340" y="388" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#0F6E56">percentile自适应阈值 · SpeakerBaseline无注册自学习 · SHAP溯源</text>
+    <line x1="340" y1="406" x2="340" y2="424" stroke="#888780" stroke-width="1.5" marker-end="url(#ar4)"/>
+
+    <rect x="180" y="428" width="320" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+    <text x="340" y="448" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">step6 Gradio Demo ✓ 端到端可演示</text>
+    <text x="340" y="466" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#854F0B">上传音频→分析→ 曲线+饼图+时间线+SHAP溯源</text>
+    <line x1="340" y1="474" x2="340" y2="492" stroke="#888780" stroke-width="1.5" marker-end="url(#ar4)"/>
+
+    <rect x="100" y="496" width="480" height="40" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+    <text x="340" y="512" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="#085041">状态轨迹图 + 分级告警 + SHAP溯源 "F0↓(-0.24) jitter↓(-0.04)"</text>
+    <text x="340" y="530" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#0F6E56">Reserved: step3特征级z-score基线 → 待多说话人数据后重新评估是否需要接入</text>
+  </g>
+</svg>
