@@ -177,11 +177,25 @@ class SpeakerBaseline:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
     def load(self, path: str):
-        """从 JSON 文件恢复基线"""
+        """从 JSON 文件恢复基线, 文件不存在则初始化空状态"""
         if not os.path.exists(path):
-            raise FileNotFoundError(f"基线文件不存在: {path}")
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+            self._speakers = {}
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.global_mean = data.get("global", {}).get("mean", self.global_mean)
+            self.global_std = data.get("global", {}).get("std", self.global_std)
+            self.cold_n = data.get("config", {}).get("cold_n", self.cold_n)
+            self.warm_n = data.get("config", {}).get("warm_n", self.warm_n)
+            self._speakers = data.get("speakers", {})
+        except (json.JSONDecodeError, KeyError) as e:
+            import shutil
+            bak = path + ".bak"
+            if os.path.exists(path):
+                shutil.copy2(path, bak)
+                print(f"[SpeakerBaseline] JSON 损坏, 已备份到 {bak}, 重建空状态")
+            self._speakers = {}
         self.global_mean = data["global"]["mean"]
         self.global_std = data["global"]["std"]
         self.cold_n = data["config"]["cold_n"]

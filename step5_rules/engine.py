@@ -139,6 +139,17 @@ def classify_dataframe(
         confidences.append(c)
         reasons.append(r)
 
+    # 如果有个体基线，用基线状态降级分类置信度
+    if baseline is not None:
+        for i in range(len(result)):
+            bl_conf_val = str(result.at[i, "baseline_conf"])
+            c = confidences[i]
+            if bl_conf_val == "low":
+                c = "low" if c == "low" else ("medium" if c == "high" else "low")
+            elif bl_conf_val == "medium" and c == "high":
+                c = "medium"
+            confidences[i] = c
+
     result["state"] = states
     result["confidence"] = confidences
     result["reason"] = reasons

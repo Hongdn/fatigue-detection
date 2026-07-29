@@ -14,8 +14,9 @@
 
 ```
 step0_voiceprint      step1_preprocess     step2_features         step4_regression       step5_rules              step6_demo
-ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SHAP双任务 → 规则引擎+个体基线判状态 → Gradio上传分析
-说话人自动分组        + VAD切分           + 文本认知指标(二期) → arousal(exertion  → 兴奋/稳定/疲劳+溯源    → 曲线/饼图/时间线
+ERes2NetV2声纹提取 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SHAP双任务 → 规则引擎+个体基线判状态 → Gradio Web分析
+持久化声纹库匹配      + VAD切分           + 文本认知指标(二期) → arousal/exertion  → 兴奋/稳定/疲劳+溯源    → 指标卡片+声纹库管理Tab
+                                                                                    +逐说话人对比+Trace日志
 
           step3_baseline（特征级z-score: 代码保留，当前不接入。XGBoost树模型对尺度不敏感）
 
@@ -35,7 +36,8 @@ ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SH
 ├── README.md
 ├── data/                        ← 训练数据（10个parquet, ~12GB）
 ├── step0_voiceprint/            ← ⓪声纹识别（已编码✅）
-│   └── cluster.py               ERes2NetV2提取+余弦聚类
+│   ├── cluster.py               ERes2NetV2提取+余弦聚类
+│   └── db.py                    VoiceprintDB 持久化声纹库
 ├── step1_preprocess/            ← ①前置处理（已编码✅）
 │   ├── denoise.py              MossFormerGAN降噪 + 自动重采样
 │   ├── vad.py                  Silero/TEN VAD 多后端
@@ -60,7 +62,7 @@ ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SH
 │   └── pipeline.py             端到端判定
 ├── checkpoints/                 ← MossFormerGAN 模型权重
 ├── output/                      ← 降噪结果 + 训练结果Excel
-├── docs/                        ← 方案文档（7篇）
+├── docs/                        ← 方案文档（8篇）
 ├── figures/                     ← 架构图（4张）
 ├── scripts/                     ← 训练脚本
 └── references/                  ← 外部参考
@@ -77,6 +79,7 @@ ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SH
 | `docs/前置处理层-模块设计.md` | 降噪→VAD→TSE 前置处理详细设计 |
 | `docs/维度回归模块-XGBoost设计.md` | XGBoost+SHAP 双任务回归详细设计 |
 | `docs/说话人基线对齐方案.md` | per-speaker 基线自学习：无注册，冷启动→切换 |
+| `docs/声纹库设计方案.md` | 持久化声纹库：跨文件说话人关联 + 个体基线积累（已实现 v0.3） |
 
 ### 架构图
 
@@ -112,12 +115,13 @@ ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SH
 | VAD | Silero VAD（默认）/ TEN VAD（可选） | ✅ |
 | 目标说话人提取 | ClearerVoice 纯音频 TSE（8kHz，二期） | 🔜 |
 | 声纹校验 | ECAPA-TDNN（后置，二期） | 🔜 |
+| 持久化声纹库 | VoiceprintDB：逐段匹配+自适应阈值+EMA质心+match_history | ✅ |
 | 生理声学特征 | openSMILE eGeMAPSv02（88维，9组分类） | ✅ |
 | 个体基线对齐 | z-score + 群体均值兜底 + 持久化 | ✅ |
 | 个体基线对齐 | per-speaker 运行均值/标准差，自适应权重混合 | ✅ |
 | 维度回归 | XGBoost 双任务回归 + SHAP 可解释 | ✅ |
 | 状态判定 | 规则引擎 + percentile自适应阈值 + SHAP溯源 | ✅ |
-| Demo | Gradio 端到端界面 | 🔜 |
+| Demo | Gradio 端到端界面（指标卡片/Progress/Tabs/Trace） | ✅ |
 
 ---
 
@@ -153,7 +157,7 @@ ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SH
 | H1 | 语音特征与 arousal 相关 | CCC > 0.5 | ✅ 0.873 |
 | H2 | arousal+exertion 映射三态 | 状态可分 | ✅ 规则引擎已跑通 |
 | H3 | 个体基线有效 | 个体内优于跨人 | 🔜 待真实数据验证 |
-| H4 | 端到端 pipeline 可跑通 | Demo 可演示 | 🔜 待 Gradio |
+| H4 | 端到端 pipeline 可跑通 | Demo 可演示 | ✅ 已实现 |
 | H5 | 降噪是硬前提 | 降噪后特征更稳定 | ✅ 已实测 |
 
 ### 4.4 已知前提
@@ -179,7 +183,7 @@ ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SH
 
 | 步骤 | 内容 | 状态 |
 |------|------|------|
-| step0 | ERes2NetV2 声纹提取 + 余弦聚类分组 | ✅ |
+| step0 | ERes2NetV2 声纹提取 + VoiceprintDB 持久化声纹库 | ✅ |
 | step1 | MossFormerGAN降噪 + Silero VAD + 质量门控 | ✅ |
 | step2 | openSMILE eGeMAPSv02 88维特征提取 | ✅ |
 | step3 | 个体 z-score 基线对齐 + 群体兜底 | 🔜 保留代码（XGBoost树模型对尺度不敏感，当前不接入） |
@@ -191,11 +195,13 @@ ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SH
 
 | 文件 | 状态 |
 |------|------|
+| step0_voiceprint/ | v2.0 声纹提取 + VoiceprintDB 持久化声纹库 |
 | step1_preprocess/ | v1.0 编码通过 |
 | step2_features/ | v1.0 编码通过 |
 | step3_baseline/ | v1.0 编码通过 |
 | step4_regression/ | v2.2 编码+全量训练完成 |
-| step5_rules/ | v1.0 编码+验证通过 |
+| step5_rules/ | v1.1 编码+验证通过（SpeakerBaseline 持久化） |
+| step6_demo/ | v3.0 声纹库管理Tab + 批量上传 + 指标卡片 + Trace |
 | docs/系统架构与选型方案.md | v1.2 有效 |
 | docs/一期MVP实现方案.md | v1.5 有效 |
 | docs/维度回归模块-XGBoost设计.md | v2.2 有效 |
@@ -203,4 +209,4 @@ ERes2NetV2声纹聚类 +  MossFormerGAN降噪 → openSMILE 88维 → XGBoost+SH
 
 ---
 
-*README.md — v2.0，2026-07-22*
+*README.md — v2.3，2026-07-29*

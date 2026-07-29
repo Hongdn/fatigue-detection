@@ -267,20 +267,18 @@ def classify_state(arousal_z, exertion_z, slope_a, slope_e):
 
 #### Step 6：Demo 界面（W6）
 
-**Gradio 界面**：
-- 上传音频文件
-- 显示：openSMILE 特征曲线 + arousal/exertion 轨迹 + 状态标注
-- 输出：状态轨迹图（matplotlib）
+**Gradio 界面**（v2.0 已实现）：
 
-```python
-import gradio as gr
-def analyze(audio):
-    # 端到端：特征→基线→回归→判定
-    return state_trajectory_plot
-gr.Interface(fn=analyze, inputs=gr.Audio(), outputs=gr.Image()).launch()
-```
+- 8 个实时指标卡片：音频时长、VAD 段数、arousal/exertion 均值、疲劳段、兴奋段、说话人数、处理耗时
+- 进度条分步反馈：加载音频 → VAD 分段 → openSMILE 特征提取 → XGBoost 推理 → 声纹聚类 → 状态判定
+- Tabs 结果区：概览 Tab（四象限图表 + Markdown 分析摘要）+ 逐段详情 Tab
+- 四象限图表：arousal/exertion 时间线、状态分布饼图、状态时间线、逐说话人唤醒度对比
+- Trace 日志：每次推理生成 `trace_id`，结构化 JSON 保存至 `output/.traces/`
+- 4 段内置示例音频（REC-1~4）
 
-**关键产出**：`app.py` + 可演示 demo
+**启动**：`python step6_demo/app.py` → 浏览器 `http://127.0.0.1:7860`
+
+**关键产出**：`step6_demo/app.py`
 
 ---
 
@@ -310,8 +308,8 @@ gr.Interface(fn=analyze, inputs=gr.Audio(), outputs=gr.Image()).launch()
 
 ### 5.4 H4 验证：端到端可跑
 
-**方法**：上传任意音频，10 秒内输出状态轨迹图
-**通过**：Demo 稳定运行，内部可演示
+**方法**：上传任意音频，完整链路输出状态分析结果（指标卡片 + 四象限图表 + 逐段详情 + Trace 日志）
+**通过**：Demo 稳定运行，内部可演示 ✅ 已通过
 
 ### 5.5 H5 验证：降噪是硬前提
 
