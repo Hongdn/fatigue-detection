@@ -1,13 +1,12 @@
 # 疲劳识别 - 使用指南
 
-> 版本：v1.3 | 日期：2026-07-29
+> 版本：v1.4 | 日期：2026-07-29
 
 ## 一、环境
 
 ```bash
 conda activate funasr              # Python 3.12
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    xgboost shap opensmile soundfile librosa gradio modelscope sortedcontainers
+pip install -r requirements.txt    # 或: -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## 二、当前完成状态
@@ -151,7 +150,13 @@ baseline.save("output/speaker_baseline.json")
 3. 音频需为 16kHz 单声道 WAV。其他格式会自动重采样。
 4. 结果仅供参考，不得直接用于安全决策。
 
-## 七、相关文档
+## 七、测试
+
+```bash
+pytest tests/ -v                 # 34 个单元测试
+```
+
+## 八、相关文档
 
 | 文档 | 内容 |
 |------|------|

@@ -2,7 +2,7 @@
 
 > 课题来源：中兵 & 大兴机场运行管理部 AI 需求课题 5.2《智能语音识别分析》
 > 聚焦：通过空管电台通话录音，分析管制员工作状态（兴奋/稳定/疲劳），辅助值班长疲劳风险管理
-> 版本：v2.4 | 2026-07-29
+> 版本：v2.5 | 2026-07-29
 
 ---
 
@@ -65,6 +65,8 @@
 │   ├── engine.py               规则引擎 + SHAP 溯源
 │   └── speaker_baseline.py     个体基线管理 + JSON 持久化
 ├── step6_demo/                 Gradio Demo
+├── tests/                      单元测试（34 个，pytest）
+├── requirements.txt            依赖清单
 ├── checkpoints/                MossFormerGAN 模型权重
 ├── output/                     降噪结果 / 训练结果 / 声纹库 JSON
 ├── docs/                       方案文档（8 篇）
