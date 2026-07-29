@@ -49,11 +49,13 @@ class SpeakerBaseline:
         global_std: float = 0.19,
         cold_n: int = 30,
         warm_n: int = 100,
+        max_n: int = 200,
     ):
         self.global_mean = global_mean
         self.global_std = global_std
         self.cold_n = cold_n
         self.warm_n = warm_n
+        self.max_n = max_n  # 超过此值触发衰减, 防止早期异常值永久污染
 
         # 每个说话人的运行统计
         self._speakers: Dict[str, dict] = {}
@@ -125,12 +127,21 @@ class SpeakerBaseline:
     ):
         """用新数据更新说话人的运行统计
 
+        超过 max_n 时触发指数衰减, 早期数据权重逐渐降低,
+        防止冷启动阶段的异常值永久污染基线。
+
         Args:
             speaker_id: 说话人标识
             arousal: 原始预测值
             exertion: 原始预测值
         """
         spk = self._get_or_create(speaker_id)
+        if spk["n"] >= self.max_n:
+            # 衰减: 等效于丢弃最旧的数据
+            decay = self.max_n / (self.max_n + 1)
+            spk["sum_a"] *= decay
+            spk["sum_sq_a"] *= decay
+            spk["n"] *= decay
         spk["sum_a"] += arousal
         spk["sum_sq_a"] += arousal ** 2
         spk["n"] += 1

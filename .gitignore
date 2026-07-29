@@ -23,6 +23,7 @@ Thumbs.db
 output/*.wav
 output/*.csv
 output/*.json
+output/*.xlsx
 output/~$*
 
 # 虚拟环境

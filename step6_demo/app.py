@@ -68,14 +68,21 @@ embedding_extractor = SpeakerClusterer(threshold=0.55)
 #  核心分析 — 单文件处理
 # ===========================================================================
 
-def _process_single_file(audio_path, baseline, trace_id):
+def _process_single_file(audio_path, baseline, trace_id, progress=None):
     """处理单个音频文件，返回 (df, metadata_dict)
-    
+
     baseline: 全局持久化 SpeakerBaseline
     逐段 embedding → VoiceprintDB 匹配 → 持久 speaker_id
+    progress: 可选 gr.Progress 实例
     """
+    def _p(frac, desc):
+        if progress:
+            progress(frac, desc=desc)
+
     timing = {}
     t_total = time.time()
+
+    _p(0.05, desc="加载音频...")
 
     audio, sr = sf.read(audio_path)
     if audio.ndim > 1:
@@ -87,6 +94,7 @@ def _process_single_file(audio_path, baseline, trace_id):
     audio_dur = len(audio) / sr
 
     # VAD
+    _p(0.10, desc="VAD 语音分段...")
     t0 = time.time()
     segments = vad_detect(audio, sr, backend="silero")
     timing["vad_ms"] = int((time.time() - t0) * 1000)
@@ -95,6 +103,7 @@ def _process_single_file(audio_path, baseline, trace_id):
         return None, {"audio_dur": audio_dur, "n_seg": 0, "error": "no_speech", "timing": timing}
 
     # openSMILE
+    _p(0.20, desc="提取声学特征...")
     t0 = time.time()
     seg_audios, seg_times, features = [], [], []
     for seg in segments:
@@ -118,6 +127,7 @@ def _process_single_file(audio_path, baseline, trace_id):
     n_seg = len(features)
 
     # XGBoost
+    _p(0.40, desc="XGBoost 推理...")
     t0 = time.time()
     pred_a = models["arousal"].predict(X)
     pred_e = models["exertion"].predict(X)
@@ -127,6 +137,7 @@ def _process_single_file(audio_path, baseline, trace_id):
     timing["xgb_ms"] = int((time.time() - t0) * 1000)
 
     # 声纹: 逐段提取 embedding → VoiceprintDB 匹配
+    _p(0.60, desc="声纹匹配...")
     t0 = time.time()
     embeddings = embedding_extractor.extract_embeddings(seg_audios, sr)
     speaker_ids = []
@@ -136,6 +147,7 @@ def _process_single_file(audio_path, baseline, trace_id):
     timing["voiceprint_ms"] = int((time.time() - t0) * 1000)
 
     # 状态判定（全局持久 SpeakerBaseline + 基线置信度降级）
+    _p(0.80, desc="状态判定...")
     t0 = time.time()
     at = _compute_thresholds(pred_a)
     et = _compute_thresholds(pred_e)
@@ -219,7 +231,7 @@ def _analyze_single(audio_path, progress):
     trace_id = uuid.uuid4().hex[:8]
     progress(0.05, desc="加载音频...")
 
-    df, meta = _process_single_file(audio_path, speaker_baseline, trace_id)
+    df, meta = _process_single_file(audio_path, speaker_baseline, trace_id, progress)
     if df is None:
         _save_trace(trace_id, meta["audio_dur"], 0, meta["timing"],
                     error=meta.get("error", "unknown"))
@@ -666,7 +678,8 @@ with gr.Blocks(
             gr.Markdown("#### 删除（合规）")
             with gr.Row():
                 delete_dd = gr.Dropdown(label="选择说话人删除", choices=[], interactive=True)
-                delete_btn = gr.Button("删除", variant="stop", size="sm")
+                delete_confirm = gr.Checkbox(label="我确认删除此说话人（不可恢复）")
+                delete_btn = gr.Button("删除", variant="stop", size="sm", interactive=False)
 
     gr.Examples(
         examples=[
@@ -702,7 +715,12 @@ with gr.Blocks(
         else:
             paths = [_to_path(fp) for fp in file_list]
 
-        df, summary, fig, df2 = analyze_audio(paths, progress)
+        try:
+            df, summary, fig, df2 = analyze_audio(paths, progress)
+        except gr.Error:
+            raise
+        except Exception as e:
+            raise gr.Error(f"分析失败: {e}")
 
         n_files = len(paths)
         if df is not None and len(df) > 0:
@@ -792,7 +810,8 @@ with gr.Blocks(
         voiceprint_db.rename(sid, new_label.strip())
         voiceprint_db.save()
         df, c1, c2, c3, c4 = _refresh_vp_table()
-        return df, c1, c2, c3, c4, f"已重命名: {sid} → {new_label.strip()}"
+        gr.Info(f"已重命名: {sid} -> {new_label.strip()}")
+        return df, c1, c2, c3, c4
 
     def _do_merge(a_display, b_display):
         if not a_display or not b_display:
@@ -804,18 +823,23 @@ with gr.Blocks(
         voiceprint_db.merge(id_a, id_b)
         voiceprint_db.save()
         df, c1, c2, c3, c4 = _refresh_vp_table()
-        return df, c1, c2, c3, c4, f"已合并: {id_b} → {id_a}"
+        gr.Info(f"已合并: {id_b} -> {id_a}")
+        return df, c1, c2, c3, c4
 
-    def _do_delete(speaker_display):
+    def _do_delete(speaker_display, confirmed):
         if not speaker_display:
             raise gr.Error("请选择要删除的说话人")
+        if not confirmed:
+            raise gr.Error("请先勾选确认框")
         sid = _parse_speaker_id(speaker_display)
         voiceprint_db.delete(sid)
         voiceprint_db.save()
         df, c1, c2, c3, c4 = _refresh_vp_table()
-        return df, c1, c2, c3, c4, f"已删除: {sid}"
+        gr.Info(f"已删除: {sid}")
+        return df, c1, c2, c3, c4, False  # False = 取消勾选
 
-    vp_status = gr.Markdown(visible=False)
+    def _toggle_delete_btn(confirmed):
+        return gr.update(interactive=confirmed)
 
     refresh_btn.click(
         fn=_refresh_vp_table,
@@ -824,18 +848,19 @@ with gr.Blocks(
     rename_btn.click(
         fn=_do_rename,
         inputs=[rename_dd, rename_input],
-        outputs=[vp_table, rename_dd, merge_a_dd, merge_b_dd, delete_dd, vp_status],
-    ).then(lambda: gr.update(visible=True), outputs=vp_status)
+        outputs=[vp_table, rename_dd, merge_a_dd, merge_b_dd, delete_dd],
+    )
     merge_btn.click(
         fn=_do_merge,
         inputs=[merge_a_dd, merge_b_dd],
-        outputs=[vp_table, rename_dd, merge_a_dd, merge_b_dd, delete_dd, vp_status],
-    ).then(lambda: gr.update(visible=True), outputs=vp_status)
+        outputs=[vp_table, rename_dd, merge_a_dd, merge_b_dd, delete_dd],
+    )
+    delete_confirm.change(fn=_toggle_delete_btn, inputs=[delete_confirm], outputs=[delete_btn])
     delete_btn.click(
         fn=_do_delete,
-        inputs=[delete_dd],
-        outputs=[vp_table, rename_dd, merge_a_dd, merge_b_dd, delete_dd, vp_status],
-    ).then(lambda: gr.update(visible=True), outputs=vp_status)
+        inputs=[delete_dd, delete_confirm],
+        outputs=[vp_table, rename_dd, merge_a_dd, merge_b_dd, delete_dd, delete_confirm],
+    )
 
     # 页面加载时自动刷新声纹库
     demo.load(fn=_refresh_vp_table, outputs=[vp_table, rename_dd, merge_a_dd, merge_b_dd, delete_dd])

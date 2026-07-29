@@ -30,7 +30,7 @@ step6_demo       (Gradio 界面)    ✅ 可运行（声纹库管理Tab）
 | `model_exertion.json` | exertion 回归，CCC=0.617 |
 | `feature_cols.json` | 88 维特征名 |
 
-训练数据：ExpressiveSpeech (HuggingFace)，已下载于 `data/` (10 个 parquet，~12GB)。
+训练数据：ExpressiveSpeech (HuggingFace: FreedomIntelligence/ExpressiveSpeech)，已下载于 `data/` (10 个 parquet，~12GB)。
 
 ## 三、快速体验：Gradio Demo
 
