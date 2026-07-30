@@ -1,6 +1,9 @@
 # 训练数据（太大，不上传git）
 data/
 
+# 敏感文档（不上传）
+references/
+
 # 外部缓存（自动下载的模型不需要上传）
 *.cache/
 modelscope/
